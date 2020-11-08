@@ -8,15 +8,14 @@ config_file = "dynip53.toml"
 config = toml.load(config_file)
 
 ip = requests.get(config["url"]).content.decode().strip()
-hosted_zones_list = config["hostedzones"]
 records_list = config["records"]
 
 r53 = boto3.client("route53")
 
 
-def get_hosted_zone(hosted_zone):
+def get_hosted_zone(record):
     zone = r53.list_hosted_zones_by_name(
-        DNSName=hosted_zone,
+        DNSName=record.split('.', 1)[1],
         MaxItems="1",
     )
     hosted_zone_name = ".".join(str(zone["HostedZones"][0]["Name"]).rsplit(".")[:-1])
@@ -24,8 +23,7 @@ def get_hosted_zone(hosted_zone):
     return {"name": hosted_zone_name, "id": hosted_zone_id}
 
 
-hosted_zones = [get_hosted_zone(hosted_zone) for hosted_zone in hosted_zones_list]
-
+hosted_zones = [get_hosted_zone(record) for record in records_list]
 
 def get_record(record, hosted_zone):
     check_record_data = r53.list_resource_record_sets(
