@@ -38,10 +38,4 @@ records = [
     "other.example.org",
     "another.sample.net",
 ]
-
-# List of hosted zones in Route53 where the records can be found.
-hostedzones = [
-    "example.org",
-    "sample.net",
-]
 ```
